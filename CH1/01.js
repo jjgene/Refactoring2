@@ -1,3 +1,4 @@
+// 공연료 청구서를 출력하는 함수
 function statement(invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
@@ -10,15 +11,15 @@ function statement(invoice, plays) {
   }).format;
 
   for (let perf of invoice[0].performances) {
-    let thisAmount = amountFor(perf, playFor(perf)); // 추출한 함수 활용
+    const play = plays[perf.playID];
+    let thisAmount = amountFor(perf, play); // 추출한 함수 활용
 
     // 포인트 적립
     volumeCredits += Math.max(perf.audience - 30, 0);
     // 희극 관객 5명마다 추가 포인트 제공
-    if ("comedy" === playFor(perf).type)
-      volumeCredits += Math.floor(perf.audience / 5);
+    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
 
-    result += `${playFor(perf).name}: ${format(thisAmount / 100)} (${
+    result += `${play.name}: ${format(thisAmount / 100)} (${
       perf.audience
     }석\n)`;
     totalAmount += thisAmount;
@@ -27,15 +28,10 @@ function statement(invoice, plays) {
   result += `적립 포인트: ${volumeCredits}점\n`;
   return result;
 
-  // 임시변수를 질의변수로 바꾸기
-  function playFor(aPerformance) {
-    return plays[aPerformance.playID];
-  }
-
   // 중첩함수
-  function amountFor(aPerformance) {
+  function amountFor(aPerformance, play) {
     let result = 0;
-    switch (playFor(aPerformance).type) {
+    switch (play.type) {
       case "tragedy":
         result = 40000;
         if (aPerformance.audience > 30) {
@@ -50,7 +46,7 @@ function statement(invoice, plays) {
         result += 300 * aPerformance.audience;
         break;
       default:
-        throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
+        throw new Error(`알 수 없는 장르: ${play.type}`);
     }
     return result;
   }
