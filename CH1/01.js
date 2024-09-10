@@ -10,24 +10,30 @@ function statement(invoice, plays) {
     minimumFractionDigits: 2,
   }).format;
 
-  for (let aPerformance of invoice[0].aPerformanceormances) {
-    const play = plays[aPerformance.playID];
-    let result = amountFor(aPerformance, play);
+  for (let perf of invoice[0].performances) {
+    const play = playFor(perf);
+    let thisAmount = amountFor(perf, play); // 추출한 함수 활용
 
     // 포인트 적립
-    volumeCredits += Math.max(aPerformance.audience - 30, 0);
+    volumeCredits += Math.max(perf.audience - 30, 0);
     // 희극 관객 5명마다 추가 포인트 제공
-    if ("comedy" === play.type)
-      volumeCredits += Math.floor(aPerformance.audience / 5);
-    //청구 내역을 출력한다.
-    result += `${play.name}:${format(result / 100)}(${
-      aPerformance.audience
+    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
+
+    result += `${play.name}: ${format(thisAmount / 100)} (${
+      perf.audience
     }석\n)`;
-    totalAmount += result;
+    totalAmount += thisAmount;
   }
   result += `총액: ${format(totalAmount / 100)}\n`;
   result += `적립 포인트: ${volumeCredits}점\n`;
-  //장르에 따른 총액 중첩 함수
+  return result;
+
+  // 임시변수를 질의변수로 바꾸기
+  function playFor(aPerformance) {
+    return plays[aPerformance.playID];
+  }
+
+  // 중첩함수
   function amountFor(aPerformance, play) {
     let result = 0;
     switch (play.type) {
@@ -47,6 +53,6 @@ function statement(invoice, plays) {
       default:
         throw new Error(`알 수 없는 장르: ${play.type}`);
     }
+    return result;
   }
-  return result;
 }
