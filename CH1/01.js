@@ -1,24 +1,3 @@
-function amountFor(aPerformance, play) {
-  let result = 0;
-  switch (play.type) {
-    case "tragedy":
-      result = 40000;
-      if (aPerformance.audience > 30) {
-        result += 1000 * (aPerformance.audience - 30);
-      }
-      break;
-    case "comedy":
-      result = 30000;
-      if (aPerformance.audience > 20) {
-        result += 10000 + 500 * (aPerformance.audience - 20);
-      }
-      result += 300 * aPerformance.audience;
-      break;
-    default:
-      throw new Error(`알 수 없는 장르: ${play.type}`);
-  }
-}
-
 // 공연료 청구서를 출력하는 함수
 function statement(invoice, plays) {
   let totalAmount = 0;
@@ -48,5 +27,26 @@ function statement(invoice, plays) {
   }
   result += `총액: ${format(totalAmount / 100)}\n`;
   result += `적립 포인트: ${volumeCredits}점\n`;
+  //장르에 따른 총액 중첩 함수
+  function amountFor(aPerformance, play) {
+    let result = 0;
+    switch (play.type) {
+      case "tragedy":
+        result = 40000;
+        if (aPerformance.audience > 30) {
+          result += 1000 * (aPerformance.audience - 30);
+        }
+        break;
+      case "comedy":
+        result = 30000;
+        if (aPerformance.audience > 20) {
+          result += 10000 + 500 * (aPerformance.audience - 20);
+        }
+        result += 300 * aPerformance.audience;
+        break;
+      default:
+        throw new Error(`알 수 없는 장르: ${play.type}`);
+    }
+  }
   return result;
 }
